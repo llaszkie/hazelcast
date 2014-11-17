@@ -3,10 +3,10 @@
  */
 package com.capgemini.nsc.arch.imdg.application;
 
+import com.capgemini.nsc.arch.imdg.details.processing.ForEachOrderProcessor;
 import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
 import com.capgemini.nsc.arch.imdg.domain.Order;
 import com.capgemini.nsc.arch.imdg.domain.OrderProcess;
-import com.capgemini.nsc.arch.imdg.domain.OrderProcessor;
 
 /**
  * Orchestration for domain logic.
@@ -25,7 +25,7 @@ public class OrderProcessUC {
 	public int processWithDB(int numberOfOrdersToProcess) {
 		return new OrderProcess(
 				new JpaOrderRepository(), 
-				new OrderProcessor() {})
+				new ForEachOrderProcessor())
 			.process(numberOfOrdersToProcess);
 	}
 

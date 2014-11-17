@@ -1,7 +1,8 @@
 package com.capgemini.nsc.arch.imdg.domain;
 
 import java.util.Collection;
-import java.util.function.Consumer;
+
+import com.google.common.base.Function;
 
 /**
  * Processor for orders
@@ -17,9 +18,6 @@ public interface OrderProcessor {
 	 * @param ordersToProcess
 	 * @return
 	 */
-	default Collection<Order> process(Collection<Order> ordersToProcess, Consumer<Order> useCase) {
-		ordersToProcess.forEach(useCase);
-		return ordersToProcess;
-	}
+	Collection<Order> process(Collection<Order> ordersToProcess, Function<Order, Order> useCase);
 
 }

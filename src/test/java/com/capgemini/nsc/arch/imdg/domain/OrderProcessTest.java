@@ -10,9 +10,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
+
+import com.google.common.base.Function;
 
 /**
  * Tests for {@link OrderProcess}
@@ -31,7 +32,16 @@ public class OrderProcessTest {
 		final List<Order> ordersToProcess = Arrays.asList(
 				new Order(1, "1", 0), new Order(2, "2", 0)
 				);
-		OrderProcessor mockedOrderProcessor = new OrderProcessor() {};
+		OrderProcessor mockedOrderProcessor = new OrderProcessor() {
+			@Override
+			public Collection<Order> process(Collection<Order> ordersToProcess,
+					Function<Order, Order> useCase) {
+				for (Order order : ordersToProcess) {
+					useCase.apply(order);
+				}
+				return ordersToProcess;
+			}};
+			
 		OrderRepository mockedOrderRepository = new OrderRepository() {
 			@Override
 			public void save(Collection<Order> updatedOrders) {
@@ -39,7 +49,7 @@ public class OrderProcessTest {
 			
 			@Override
 			public Collection<Order> loadOrders(int numberOfOrdersToLoad) {
-				return ordersToProcess.stream().limit(numberOfOrdersToLoad).collect(Collectors.toList());
+				return ordersToProcess.subList(0, numberOfOrdersToLoad);
 			}
 		};
 		OrderProcess sut = new OrderProcess(mockedOrderRepository, mockedOrderProcessor);

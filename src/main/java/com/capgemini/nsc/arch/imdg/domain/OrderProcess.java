@@ -5,6 +5,8 @@ package com.capgemini.nsc.arch.imdg.domain;
 
 import java.util.Collection;
 
+import com.google.common.base.Function;
+
 /**
  * @author LLASZKIE
  *
@@ -37,7 +39,14 @@ public class OrderProcess {
 	 */
 	public int process(int numberOfOrdersToProcess) {
 		Collection<Order> ordersToProcess = orderRepository.loadOrders(numberOfOrdersToProcess);
-		Collection<Order> processedOrders = orderProcessor.process(ordersToProcess, o -> o.calculateTotal());
+		Collection<Order> processedOrders = orderProcessor.process(ordersToProcess, 
+				new Function<Order, Order>() {
+					@Override
+					public Order apply(Order input) {
+						input.calculateTotal();
+						return input;
+					}
+				});
 		orderRepository.save(processedOrders);
 		return processedOrders.size();
 	}
