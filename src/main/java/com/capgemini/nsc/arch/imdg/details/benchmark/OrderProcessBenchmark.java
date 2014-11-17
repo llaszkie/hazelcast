@@ -3,11 +3,11 @@
  */
 package com.capgemini.nsc.arch.imdg.details.benchmark;
 
+import java.util.concurrent.TimeUnit;
+
 import com.capgemini.nsc.arch.imdg.application.OrderProcessUC;
-import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
-import com.capgemini.nsc.arch.imdg.domain.OrderProcess;
-import com.google.caliper.Benchmark;
-import com.google.caliper.Param;
+import com.capgemini.nsc.arch.imdg.domain.Metrics;
+import com.codahale.metrics.ConsoleReporter;
 
 /**
  * @author LLASZKIE
@@ -15,28 +15,33 @@ import com.google.caliper.Param;
  */
 public final class OrderProcessBenchmark {
 
-	@Param({
-		"1",
-		"10",
-		"100"
-	}) 
-	int numberOfOrdersToProcess;  // -DnumberOfOrdersToProcess=1,2,3
-	
-	/**
-	 * Benchmark for {@link OrderProcess} based on:
-	 * 	1) JPA storage: {@link JpaOrderRepository}
-	 *  2) Default processing 
-	 * 
-	 * @param reps
-	 * @return
-	 */
-	@Benchmark int jpaStoreDefaultProcessing(int reps) {
-		int numberOfOrdersToProcess = this.numberOfOrdersToProcess;
+	static final int[] numberOfOrdersToProcess = new int[] { 1, 10, 1000, 100000 };
+	private static ConsoleReporter reporter;
+
+	public static void main(String args[]) {
+		startReport();
+		benchmarkJpaStoreDefaultProcessing();
+		stopReport();
+		System.err.println("Finished!");
+	}
+
+
+	private static void benchmarkJpaStoreDefaultProcessing() {
 		OrderProcessUC uc = new OrderProcessUC();
-		int result = 0;
-		for (int i = 0; i < reps; i++) {
-			result |= uc.processWithDB(numberOfOrdersToProcess);
+		for (int i : numberOfOrdersToProcess) {
+			uc.processWithDB(i, "DB_" + i + "_");
 		}
-		return result;
+	}
+
+	private static void startReport() {
+		reporter = ConsoleReporter.forRegistry(Metrics.registry)
+				.convertRatesTo(TimeUnit.SECONDS)
+				.convertDurationsTo(TimeUnit.MILLISECONDS).build();
+		reporter.start(1, TimeUnit.MINUTES);
+	}
+	
+	private static void stopReport() {
+		reporter.report();
+		reporter.stop();
 	}
 }

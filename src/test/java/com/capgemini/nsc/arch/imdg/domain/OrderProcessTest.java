@@ -45,7 +45,7 @@ public class OrderProcessTest {
 		OrderProcess sut = new OrderProcess(mockedOrderRepository, mockedOrderProcessor);
 				
 		// when
-		int processed = sut.process(1);
+		int processed = sut.process(1, "FAKE");
 		
 		// then
 		assertEquals(1, processed);

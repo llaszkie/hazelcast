@@ -39,12 +39,6 @@ public class Order implements Serializable {
 	 */
 	public void calculateTotal() {
 		total = new Random(new Date().getTime()).nextInt(100000) + 1;
-		
-		try {
-			Thread.sleep(10);
-		} catch (InterruptedException ignoreMe) {
-			ignoreMe.printStackTrace();
-		}
 	}
 	
 	/**

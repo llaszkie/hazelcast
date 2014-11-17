@@ -20,13 +20,14 @@ public class OrderProcessUC {
 	 * Use Case for processing orders using JPA and default algorithm
 	 * 
 	 * @param numberOfOrdersToProcess
+	 * @param timerName 
 	 * @return count of processed {@link Order}s
 	 */
-	public int processWithDB(int numberOfOrdersToProcess) {
+	public int processWithDB(int numberOfOrdersToProcess, String timerName) {
 		return new OrderProcess(
 				new JpaOrderRepository(), 
 				new OrderProcessor() {})
-			.process(numberOfOrdersToProcess);
+			.process(numberOfOrdersToProcess, timerName);
 	}
 
 }
