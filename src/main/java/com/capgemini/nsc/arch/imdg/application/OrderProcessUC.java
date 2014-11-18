@@ -3,6 +3,7 @@
  */
 package com.capgemini.nsc.arch.imdg.application;
 
+import com.capgemini.nsc.arch.imdg.details.processing.OrderStreamProcessor;
 import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
 import com.capgemini.nsc.arch.imdg.domain.Order;
 import com.capgemini.nsc.arch.imdg.domain.OrderProcess;
@@ -27,6 +28,20 @@ public class OrderProcessUC {
 		return new OrderProcess(
 				new JpaOrderRepository(), 
 				new OrderProcessor() {})
+			.process(numberOfOrdersToProcess, timerName);
+	}
+	
+	/**
+	 * Use Case for processing orders using JPA and parallel stream algorithm
+	 * 
+	 * @param numberOfOrdersToProcess
+	 * @param timerName 
+	 * @return count of processed {@link Order}s
+	 */
+	public int processWithDBAndStream(int numberOfOrdersToProcess, String timerName) {
+		return new OrderProcess(
+				new JpaOrderRepository(), 
+				new OrderStreamProcessor() {})
 			.process(numberOfOrdersToProcess, timerName);
 	}
 
