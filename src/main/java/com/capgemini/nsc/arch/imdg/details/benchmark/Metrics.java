@@ -1,4 +1,4 @@
-package com.capgemini.nsc.arch.imdg.domain;
+package com.capgemini.nsc.arch.imdg.details.benchmark;
 
 import com.codahale.metrics.MetricRegistry;
 

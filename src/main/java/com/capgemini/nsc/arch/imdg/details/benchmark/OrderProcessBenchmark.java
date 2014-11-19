@@ -8,7 +8,6 @@ import java.lang.management.ManagementFactory;
 import java.util.concurrent.TimeUnit;
 
 import com.capgemini.nsc.arch.imdg.application.OrderProcessUC;
-import com.capgemini.nsc.arch.imdg.domain.Metrics;
 import com.codahale.metrics.ConsoleReporter;
 
 /**

@@ -5,6 +5,7 @@ package com.capgemini.nsc.arch.imdg.domain;
 
 import java.util.Collection;
 
+import com.capgemini.nsc.arch.imdg.details.benchmark.Metrics;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.Timer.Context;
 
