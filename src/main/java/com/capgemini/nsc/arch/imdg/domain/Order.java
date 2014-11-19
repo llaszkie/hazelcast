@@ -101,6 +101,12 @@ public class Order implements Serializable {
 		return true;
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", total=" + total + "]";
+	}
 	
 }

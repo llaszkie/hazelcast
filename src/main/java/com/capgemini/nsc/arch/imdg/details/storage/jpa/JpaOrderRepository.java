@@ -43,15 +43,7 @@ public class JpaOrderRepository implements OrderRepository {
 				.getResultList();
 		entityManager.getTransaction().commit();
 
-		List<Order> orders = new ArrayList<Order>(orderEntities.size());
-		for (OrderEntity orderEntity : orderEntities) {
-			orders.add(orderFromEntity(orderEntity));
-		}
-		return orders;
-	}
-
-	private Order orderFromEntity(OrderEntity orderEntity) {
-		return new Order(orderEntity.getId(), orderEntity.getPayload(), orderEntity.getTotal() == null ? 0 : orderEntity.getTotal());
+		return transform(orderEntities);
 	}
 
 	/*
@@ -72,11 +64,38 @@ public class JpaOrderRepository implements OrderRepository {
 		entityManager.getTransaction().commit();
 	}
 
-	// TODO: test me please!!
-//	public static void main(String[] args) {
-//		Collection<Order> orders = new JpaOrderRepository().loadOrders(10);
-//		orders.iterator().next().calculateTotal();
-//		new JpaOrderRepository().save(orders);
-//	}
+	
+	/**
+	 * Pattern applied for iterating over large result set
+	 * 
+	 * @param offset
+	 * @param max
+	 * @return
+	 */
+	public List<Order> loadOrdersIterable(int offset, int max)
+	{
+		entityManager.getTransaction().begin();
+		List<OrderEntity> orderEntities = entityManager
+				.createQuery("from OrderEntity", OrderEntity.class)
+				.setFirstResult(offset).setMaxResults(max).getResultList();
+		entityManager.getTransaction().commit();
+		
+		return transform(orderEntities);
+	}
+	
+	private Order orderFromEntity(OrderEntity orderEntity) {
+		return new Order(orderEntity.getId(), orderEntity.getPayload(), orderEntity.getTotal() == null ? 0 : orderEntity.getTotal());
+	}
+
+	private List<Order> transform(List<OrderEntity> orderEntities) {
+		List<Order> orders = new ArrayList<Order>(orderEntities.size());
+		for (OrderEntity orderEntity : orderEntities) {
+			orders.add(orderFromEntity(orderEntity));
+		}
+		return orders;
+	}
+	
+	
+	
 }
 

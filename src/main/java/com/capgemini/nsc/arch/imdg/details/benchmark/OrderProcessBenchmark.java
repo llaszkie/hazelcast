@@ -20,7 +20,7 @@ public final class OrderProcessBenchmark {
 	static final int[] numberOfOrdersToProcess = new int[] { 10000 };
 	private static ConsoleReporter reporter;
 
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws Exception {
 		waitForAffinity();
 		startReport();
 		benchmarkJpaStoreDefaultProcessing();

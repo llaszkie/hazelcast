@@ -10,7 +10,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
 import com.capgemini.nsc.arch.imdg.domain.Order;
 
 /**
@@ -34,7 +33,7 @@ public class JpaOrderRepositoryTest {
 		Collection<Order> orders = sut.loadOrders(expectedNumberOfOrders);
 		// then
 		Assert.assertFalse(orders.isEmpty());
-		Assert.assertEquals(10, orders.size());
+		Assert.assertEquals(expectedNumberOfOrders, orders.size());
 	}
 
 
@@ -70,6 +69,26 @@ public class JpaOrderRepositoryTest {
 		
 		// then
 		Assert.assertEquals(expectedOrder, savedOrder);
+	}
+	
+
+
+	/**
+	 * Test method for {@link com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository#loadOrdersIterable(int, int)}.
+	 */
+	@Test
+	public void testloadOrdersIterable() {
+		// given - when
+		Collection<Order> orders = sut.loadOrdersIterable(0, 1);
+		Order expectedFirstOrder = orders.iterator().next();
+
+		orders = sut.loadOrdersIterable(1, 1);
+		Order expectedSecondOrder = orders.iterator().next();
+		
+		// then
+		Assert.assertNotNull(expectedFirstOrder);
+		Assert.assertNotNull(expectedSecondOrder);
+		Assert.assertFalse(expectedFirstOrder.equals(expectedSecondOrder));
 	}
 
 }
