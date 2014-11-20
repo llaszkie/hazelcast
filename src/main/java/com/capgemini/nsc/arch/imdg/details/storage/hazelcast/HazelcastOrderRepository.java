@@ -4,12 +4,12 @@
 package com.capgemini.nsc.arch.imdg.details.storage.hazelcast;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
 import com.capgemini.nsc.arch.imdg.domain.Order;
 import com.capgemini.nsc.arch.imdg.domain.OrderRepository;
-import com.hazelcast.core.IList;
+import com.hazelcast.core.IMap;
 
 /**
  * Hazelcast based IMDG repository
@@ -25,22 +25,22 @@ public class HazelcastOrderRepository implements OrderRepository {
 	 * @see com.capgemini.nsc.arch.imdg.domain.OrderRepository#loadOrders(int)
 	 */
 	@Override
-	public Collection<Order> loadOrders(int numberOfOrdersToLoad) {
+	public Map<Long, Order> loadOrders(int numberOfOrdersToLoad) {
 		// source of data
 		JpaOrderRepository jpaOrderRepository = new JpaOrderRepository();
 		// distributed collection
 		initilizeDistributedCollection();
 
 		int offset = 0;
-		List<Order> orders;
+		Collection<Order> orders;
 		// read the data in a scrollable way ...
-		List<Order> distributedOrderList = getDistributedOrderList();
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
 		scrolling: while ((orders = jpaOrderRepository.loadOrdersIterable(offset, 100)).size() > 0) {
 			System.out.println("Loading orders: " + offset + "/" + numberOfOrdersToLoad);
 			for (Order order : orders) {
 				// and feed the cluster :-)
-				if (distributedOrderList.size() < numberOfOrdersToLoad) {
-					distributedOrderList.add(order);
+				if (distributedOrderMap.size() < numberOfOrdersToLoad) {
+					distributedOrderMap.put(order.getId(), order);
 				} else {
 					break scrolling;
 				}
@@ -48,9 +48,14 @@ public class HazelcastOrderRepository implements OrderRepository {
 			offset += orders.size();
 		}
 
-		return distributedOrderList;
+		return distributedOrderMap;
 	}
 
+	Order loadOrder(long orderId) {
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
+		return distributedOrderMap.get(orderId);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -59,7 +64,7 @@ public class HazelcastOrderRepository implements OrderRepository {
 	 * )
 	 */
 	@Override
-	public void save(Collection<Order> updatedOrders) {
+	public void save(Map<Long, Order> updatedOrders) {
 		// Nothing to do here :-)
 	}
 
@@ -67,13 +72,13 @@ public class HazelcastOrderRepository implements OrderRepository {
 	// private
 	// ----------
 	
-	private IList<Order> getDistributedOrderList() {
-		return HazelcastClientProvider.hazelcast.getList("orders");
+	private IMap<Long, Order> getDistributedOrderList() {
+		return HazelcastClientProvider.hazelcast.getMap("orders");
 	}
 
 	private void initilizeDistributedCollection() {
-		List<Order> distributedOrderList = getDistributedOrderList();
-		distributedOrderList.clear();
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
+		distributedOrderMap.clear();
 	}
 
 }

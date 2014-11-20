@@ -3,7 +3,7 @@
  */
 package com.capgemini.nsc.arch.imdg.details.processing;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import com.capgemini.nsc.arch.imdg.domain.Order;
@@ -19,9 +19,9 @@ public class OrderStreamProcessor implements OrderProcessor {
 	 * @see com.capgemini.nsc.arch.imdg.domain.OrderProcessor#process(java.util.Collection, java.util.function.Consumer, java.lang.String)
 	 */
 	@Override
-	public Collection<Order> process(Collection<Order> ordersToProcess,
+	public Map<Long, Order> process(Map<Long, Order> ordersToProcess,
 			Consumer<Order> useCase, String timerName) {
-		ordersToProcess.stream().parallel().forEach(useCase);
+		ordersToProcess.values().stream().parallel().forEach(useCase);
 		return ordersToProcess;
 	}
 	

@@ -3,7 +3,7 @@
  */
 package com.capgemini.nsc.arch.imdg.domain;
 
-import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author LLASZKIE
@@ -17,13 +17,13 @@ public interface OrderRepository {
 	 * @param numberOfOrdersToLoad Loads given number of {@link Order}
 	 * @return
 	 */
-	Collection<Order> loadOrders(int numberOfOrdersToLoad);
+	Map<Long, Order> loadOrders(int numberOfOrdersToLoad);
 
 	/**
 	 * Port for repository delivery: save
 	 * 
 	 * @param updatedOrders to be saved
 	 */
-	void save(Collection<Order> updatedOrders);
+	void save(Map<Long, Order> updatedOrders);
 
 }

@@ -8,8 +8,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
@@ -34,12 +34,12 @@ public class OrderProcessTest {
 		OrderProcessor mockedOrderProcessor = new OrderProcessor() {};
 		OrderRepository mockedOrderRepository = new OrderRepository() {
 			@Override
-			public void save(Collection<Order> updatedOrders) {
+			public Map<Long, Order> loadOrders(int numberOfOrdersToLoad) {
+				return ordersToProcess.stream().limit(numberOfOrdersToLoad).collect(Collectors.toMap(o -> o.getId(), o -> o));
 			}
-			
+
 			@Override
-			public Collection<Order> loadOrders(int numberOfOrdersToLoad) {
-				return ordersToProcess.stream().limit(numberOfOrdersToLoad).collect(Collectors.toList());
+			public void save(Map<Long, Order> updatedOrders) {
 			}
 		};
 		OrderProcess sut = new OrderProcess(mockedOrderRepository, mockedOrderProcessor);

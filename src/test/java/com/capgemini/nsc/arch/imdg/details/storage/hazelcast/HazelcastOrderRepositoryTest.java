@@ -3,7 +3,7 @@
  */
 package com.capgemini.nsc.arch.imdg.details.storage.hazelcast;
 
-import java.util.Collection;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -30,7 +30,7 @@ public class HazelcastOrderRepositoryTest {
 		// given
 		int expectedNumberOfOrders = 10;
 		// when 
-		Collection<Order> orders = sut.loadOrders(expectedNumberOfOrders);
+		Map<Long, Order> orders = sut.loadOrders(expectedNumberOfOrders);
 		// then
 		Assert.assertFalse(orders.isEmpty());
 		Assert.assertEquals(expectedNumberOfOrders, orders.size());

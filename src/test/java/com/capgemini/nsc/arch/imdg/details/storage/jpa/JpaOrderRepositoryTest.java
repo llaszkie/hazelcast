@@ -3,8 +3,9 @@
  */
 package com.capgemini.nsc.arch.imdg.details.storage.jpa;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -30,7 +31,7 @@ public class JpaOrderRepositoryTest {
 		// given
 		int expectedNumberOfOrders = 10;
 		// when 
-		Collection<Order> orders = sut.loadOrders(expectedNumberOfOrders);
+		Map<Long, Order> orders = sut.loadOrders(expectedNumberOfOrders);
 		// then
 		Assert.assertFalse(orders.isEmpty());
 		Assert.assertEquals(expectedNumberOfOrders, orders.size());
@@ -43,8 +44,8 @@ public class JpaOrderRepositoryTest {
 	@Test
 	public void testLoadOrder() {
 		// given
-		Collection<Order> orders = sut.loadOrders(1);
-		Order expectedOrder = orders.iterator().next();
+		Map<Long, Order> orders = sut.loadOrders(1);
+		Order expectedOrder = orders.values().iterator().next();
 		// when 
 		
 		Order order = sut.loadOrder(expectedOrder.getId());
@@ -59,12 +60,14 @@ public class JpaOrderRepositoryTest {
 	@Test
 	public void testSave() {
 		// given
-		Collection<Order> orders = sut.loadOrders(1);
-		Order expectedOrder = orders.iterator().next();
+		Map<Long, Order> orders = sut.loadOrders(1);
+		Order expectedOrder = orders.values().iterator().next();
 		expectedOrder.calculateTotal();
-		
-		// when 
-		sut.save(Arrays.asList(expectedOrder));
+		Map<Long, Order> expectedOrders = new HashMap<Long, Order>();  
+		expectedOrders.put(expectedOrder.getId(), expectedOrder);
+
+		// when
+		sut.save(expectedOrders);
 		Order savedOrder =sut.loadOrder(expectedOrder.getId());
 		
 		// then

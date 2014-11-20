@@ -3,9 +3,10 @@
  */
 package com.capgemini.nsc.arch.imdg.details.storage.jpa;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -28,7 +29,7 @@ public class JpaOrderRepository implements OrderRepository {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Order> loadOrders(int numberOfOrdersToLoad) {
+	public Map<Long, Order> loadOrders(int numberOfOrdersToLoad) {
 		startTransactionEntityManager();
 		List<OrderEntity> orderEntities = entityManager
 				.createQuery("from OrderEntity").setMaxResults(numberOfOrdersToLoad)
@@ -46,9 +47,9 @@ public class JpaOrderRepository implements OrderRepository {
 	 * )
 	 */
 	@Override
-	public void save(Collection<Order> updatedOrders) {
+	public void save(Map<Long, Order> updatedOrders) {
 		startTransactionEntityManager();
-		for (Order order : updatedOrders) {
+		for (Order order : updatedOrders.values()) {
 			OrderEntity orderEntity = entityManager.find(OrderEntity.class,
 					order.getId());
 			orderEntity.setTotal(order.getTotal());
@@ -64,7 +65,7 @@ public class JpaOrderRepository implements OrderRepository {
 	 * @param max
 	 * @return
 	 */
-	public List<Order> loadOrdersIterable(int offset, int max)
+	public Collection<Order> loadOrdersIterable(int offset, int max)
 	{
 		startTransactionEntityManager();
 		List<OrderEntity> orderEntities = entityManager
@@ -72,7 +73,7 @@ public class JpaOrderRepository implements OrderRepository {
 				.setFirstResult(offset).setMaxResults(max).getResultList();
 		flushAndCommitEntityManager();
 		
-		return transform(orderEntities);
+		return transform(orderEntities).values();
 	}
 
 	// ---------- 
@@ -106,10 +107,10 @@ public class JpaOrderRepository implements OrderRepository {
 		entityManager.getTransaction().begin();
 	}
 
-	private List<Order> transform(List<OrderEntity> orderEntities) {
-		List<Order> orders = new ArrayList<Order>(orderEntities.size());
+	private Map<Long, Order> transform(List<OrderEntity> orderEntities) {
+		Map<Long, Order> orders = new HashMap<Long, Order>(orderEntities.size());
 		for (OrderEntity orderEntity : orderEntities) {
-			orders.add(orderFromEntity(orderEntity));
+			orders.put(orderEntity.getId(), orderFromEntity(orderEntity));
 		}
 		return orders;
 	}

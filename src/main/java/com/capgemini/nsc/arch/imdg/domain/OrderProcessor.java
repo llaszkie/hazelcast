@@ -1,6 +1,6 @@
 package com.capgemini.nsc.arch.imdg.domain;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -18,8 +18,8 @@ public interface OrderProcessor {
 	 * @param timerName 
 	 * @return
 	 */
-	default Collection<Order> process(Collection<Order> ordersToProcess, Consumer<Order> useCase, String timerName) {
-		ordersToProcess.forEach(useCase);
+	default Map<Long, Order> process(Map<Long, Order> ordersToProcess, Consumer<Order> useCase, String timerName) {
+		ordersToProcess.values().forEach(useCase);
 		return ordersToProcess;
 	}
 

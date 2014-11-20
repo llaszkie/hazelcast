@@ -5,9 +5,9 @@ package com.capgemini.nsc.arch.imdg.details.processing;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -27,16 +27,16 @@ public class OrderStreamProcessorTest {
 	@Test
 	public void testProcess() {
 		// given
-		final List<Order> ordersToProcess = Arrays.asList(
-				new Order(1, "1", 0), new Order(2, "2", 0)
-				);
+		final Map<Long, Order> ordersToProcess = new HashMap<Long, Order>();
+		ordersToProcess.put(1L, new Order(1, "1", 0));
+		ordersToProcess.put(2L, new Order(2, "2", 0));
 		OrderStreamProcessor sut = new OrderStreamProcessor();
 				
 		// when
-		Collection<Order> processedOrders = sut.process(ordersToProcess, o -> o.calculateTotal(), "FAKE");
+		Map<Long, Order> processedOrders = sut.process(ordersToProcess, o -> o.calculateTotal(), "FAKE");
 		
 		// then
-		assertTrue(processedOrders.stream().allMatch(OrderStreamProcessorTest::orderWasProcessed));
+		assertTrue(processedOrders.values().stream().allMatch(OrderStreamProcessorTest::orderWasProcessed));
 	}
 
 	/**
