@@ -34,7 +34,7 @@ public class HazelcastOrderRepository implements OrderRepository {
 		int offset = 0;
 		Collection<Order> orders;
 		// read the data in a scrollable way ...
-		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderMap();
 		scrolling: while ((orders = jpaOrderRepository.loadOrdersIterable(offset, 100)).size() > 0) {
 			System.out.println("Loading orders: " + offset + "/" + numberOfOrdersToLoad);
 			for (Order order : orders) {
@@ -52,7 +52,7 @@ public class HazelcastOrderRepository implements OrderRepository {
 	}
 
 	Order loadOrder(long orderId) {
-		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderMap();
 		return distributedOrderMap.get(orderId);
 	}
 	
@@ -72,12 +72,12 @@ public class HazelcastOrderRepository implements OrderRepository {
 	// private
 	// ----------
 	
-	private IMap<Long, Order> getDistributedOrderList() {
+	private IMap<Long, Order> getDistributedOrderMap() {
 		return HazelcastClientProvider.hazelcast.getMap("orders");
 	}
 
 	private void initilizeDistributedCollection() {
-		IMap<Long,Order> distributedOrderMap = getDistributedOrderList();
+		IMap<Long,Order> distributedOrderMap = getDistributedOrderMap();
 		distributedOrderMap.clear();
 	}
 

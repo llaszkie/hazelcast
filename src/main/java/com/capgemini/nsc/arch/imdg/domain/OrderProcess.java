@@ -3,7 +3,9 @@
  */
 package com.capgemini.nsc.arch.imdg.domain;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.capgemini.nsc.arch.imdg.details.benchmark.Metrics;
 import com.codahale.metrics.Timer;
@@ -56,7 +58,7 @@ public class OrderProcess {
 	private Map<Long, Order> processOrders(Map<Long, Order> ordersToProcess,
 			String timerName) {
 		Context time = measureProcessStart(timerName);
-		Map<Long, Order> processedOrders = orderProcessor.process(ordersToProcess, o -> o.calculateTotal(), timerName);
+		Map<Long, Order> processedOrders = orderProcessor.process(ordersToProcess, (Consumer<Order> & Serializable) o -> o.calculateTotal(), timerName);
 		time.close();
 		return processedOrders;
 	}

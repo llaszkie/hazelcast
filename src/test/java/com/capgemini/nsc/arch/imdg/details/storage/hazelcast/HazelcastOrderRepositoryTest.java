@@ -35,5 +35,19 @@ public class HazelcastOrderRepositoryTest {
 		Assert.assertFalse(orders.isEmpty());
 		Assert.assertEquals(expectedNumberOfOrders, orders.size());
 	}
-
+	
+	/**
+	 * Test method for {@link com.capgemini.nsc.arch.imdg.details.storage.hazelcast.HazelcastOrderRepository#loadOrder(long)}.
+	 */
+	@Test
+	public void testLoadOrder() {
+		// given
+		Order expectedOrder = sut.loadOrders(1).values().toArray(new Order[0])[0];
+		// when
+		Order loadedOrder = sut.loadOrder(expectedOrder.getId());
+		// then
+		Assert.assertNotNull(loadedOrder);
+		Assert.assertEquals(expectedOrder, loadedOrder);
+	}
+	
 }
