@@ -6,12 +6,10 @@ package com.capgemini.nsc.arch.imdg.details.storage.hazelcast;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
-import com.capgemini.nsc.arch.imdg.details.storage.jpa.EntityManagerProvider;
 import com.capgemini.nsc.arch.imdg.details.storage.jpa.JpaOrderRepository;
 import com.capgemini.nsc.arch.imdg.domain.Order;
 import com.capgemini.nsc.arch.imdg.domain.OrderRepository;
+import com.hazelcast.core.IList;
 
 /**
  * Hazelcast based IMDG repository
@@ -20,8 +18,6 @@ import com.capgemini.nsc.arch.imdg.domain.OrderRepository;
  *
  */
 public class HazelcastOrderRepository implements OrderRepository {
-
-	private EntityManager entityManager = EntityManagerProvider.getEntityManager();
 
 	/*
 	 * (non-Javadoc)
@@ -33,33 +29,26 @@ public class HazelcastOrderRepository implements OrderRepository {
 		// source of data
 		JpaOrderRepository jpaOrderRepository = new JpaOrderRepository();
 		// distributed collection
-		List<Order> distributedOrderList = HazelcastClientProvider.hazelcast.getList("orders");
-		distributedOrderList.clear();
+		initilizeDistributedCollection();
 
 		int offset = 0;
 		List<Order> orders;
 		// read the data in a scrollable way ...
+		List<Order> distributedOrderList = getDistributedOrderList();
 		scrolling: while ((orders = jpaOrderRepository.loadOrdersIterable(offset, 100)).size() > 0) {
 			System.out.println("Loading orders: " + offset + "/" + numberOfOrdersToLoad);
-			startTransactionEntityManager();
 			for (Order order : orders) {
 				// and feed the cluster :-)
 				if (distributedOrderList.size() < numberOfOrdersToLoad) {
 					distributedOrderList.add(order);
 				} else {
-					flushAndCommitEntityManager();
 					break scrolling;
 				}
 			}
-			flushAndCommitEntityManager();
 			offset += orders.size();
 		}
 
 		return distributedOrderList;
-	}
-
-	private void startTransactionEntityManager() {
-		entityManager.getTransaction().begin();
 	}
 
 	/*
@@ -74,10 +63,17 @@ public class HazelcastOrderRepository implements OrderRepository {
 		// Nothing to do here :-)
 	}
 
-	private void flushAndCommitEntityManager() {
-		entityManager.flush();
-		entityManager.clear();
-		entityManager.getTransaction().commit();
+	// ---------- 
+	// private
+	// ----------
+	
+	private IList<Order> getDistributedOrderList() {
+		return HazelcastClientProvider.hazelcast.getList("orders");
+	}
+
+	private void initilizeDistributedCollection() {
+		List<Order> distributedOrderList = getDistributedOrderList();
+		distributedOrderList.clear();
 	}
 
 }

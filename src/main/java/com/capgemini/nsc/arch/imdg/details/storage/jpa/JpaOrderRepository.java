@@ -21,14 +21,6 @@ public class JpaOrderRepository implements OrderRepository {
 	private EntityManager entityManager = EntityManagerProvider
 			.getEntityManager();
 
-	Order loadOrder(long orderId) {
-		entityManager.getTransaction().begin();
-		OrderEntity orderEntity = entityManager.find(OrderEntity.class, orderId);
-		entityManager.getTransaction().commit();
-		
-		return orderEntity != null ? orderFromEntity(orderEntity) : null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -37,11 +29,11 @@ public class JpaOrderRepository implements OrderRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Order> loadOrders(int numberOfOrdersToLoad) {
-		entityManager.getTransaction().begin();
+		startTransactionEntityManager();
 		List<OrderEntity> orderEntities = entityManager
 				.createQuery("from OrderEntity").setMaxResults(numberOfOrdersToLoad)
 				.getResultList();
-		entityManager.getTransaction().commit();
+		flushAndCommitEntityManager();
 
 		return transform(orderEntities);
 	}
@@ -55,13 +47,13 @@ public class JpaOrderRepository implements OrderRepository {
 	 */
 	@Override
 	public void save(Collection<Order> updatedOrders) {
-		entityManager.getTransaction().begin();
+		startTransactionEntityManager();
 		for (Order order : updatedOrders) {
 			OrderEntity orderEntity = entityManager.find(OrderEntity.class,
 					order.getId());
 			orderEntity.setTotal(order.getTotal());
 		}
-		entityManager.getTransaction().commit();
+		flushAndCommitEntityManager();
 	}
 
 	
@@ -74,17 +66,44 @@ public class JpaOrderRepository implements OrderRepository {
 	 */
 	public List<Order> loadOrdersIterable(int offset, int max)
 	{
-		entityManager.getTransaction().begin();
+		startTransactionEntityManager();
 		List<OrderEntity> orderEntities = entityManager
 				.createQuery("from OrderEntity", OrderEntity.class)
 				.setFirstResult(offset).setMaxResults(max).getResultList();
-		entityManager.getTransaction().commit();
+		flushAndCommitEntityManager();
 		
 		return transform(orderEntities);
 	}
+
+	// ---------- 
+	// protected
+	// ----------
+
+	Order loadOrder(long orderId) {
+		startTransactionEntityManager();		
+		OrderEntity orderEntity = entityManager.find(OrderEntity.class, orderId);
+		flushAndCommitEntityManager();
+		
+		return orderEntity != null ? orderFromEntity(orderEntity) : null;
+	}
+
 	
+	// ---------- 
+	// private
+	// ----------
+
+	private void flushAndCommitEntityManager() {
+		entityManager.flush();
+		entityManager.clear();
+		entityManager.getTransaction().commit();
+	}
+
 	private Order orderFromEntity(OrderEntity orderEntity) {
 		return new Order(orderEntity.getId(), orderEntity.getPayload(), orderEntity.getTotal() == null ? 0 : orderEntity.getTotal());
+	}
+
+	private void startTransactionEntityManager() {
+		entityManager.getTransaction().begin();
 	}
 
 	private List<Order> transform(List<OrderEntity> orderEntities) {
@@ -94,8 +113,7 @@ public class JpaOrderRepository implements OrderRepository {
 		}
 		return orders;
 	}
-	
-	
+
 	
 }
 

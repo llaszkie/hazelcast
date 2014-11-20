@@ -28,7 +28,7 @@ public class HazelcastOrderRepositoryTest {
 	@Test
 	public void testLoadOrders() {
 		// given
-		int expectedNumberOfOrders = 10000;
+		int expectedNumberOfOrders = 10;
 		// when 
 		Collection<Order> orders = sut.loadOrders(expectedNumberOfOrders);
 		// then

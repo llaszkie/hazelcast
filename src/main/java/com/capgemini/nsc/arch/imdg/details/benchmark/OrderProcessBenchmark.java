@@ -22,7 +22,8 @@ public final class OrderProcessBenchmark {
 	public static void main(String args[]) throws Exception {
 		waitForAffinity();
 		startReport();
-		benchmarkJpaStoreDefaultProcessing();
+//		benchmarkJpaStoreProcessing();
+		benchmarkHazelcastProcessing();
 		stopReport();
 	}
 
@@ -34,11 +35,18 @@ public final class OrderProcessBenchmark {
 	}
 
 
-	private static void benchmarkJpaStoreDefaultProcessing() {
+	private static void benchmarkJpaStoreProcessing() {
 		OrderProcessUC uc = new OrderProcessUC();
 		for (int i : numberOfOrdersToProcess) {
 			uc.processWithDB(i, "DB_" + i + "_");
 			uc.processWithDBAndStream(i, "DB_Stream_" + i + "_");
+		}	
+	}
+
+	private static void benchmarkHazelcastProcessing() {
+		OrderProcessUC uc = new OrderProcessUC();
+		for (int i : numberOfOrdersToProcess) {
+			uc.processWithHazelcast(i, "Hazeclast_" + i + "_");
 		}	
 	}
 
