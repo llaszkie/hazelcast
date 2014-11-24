@@ -1,7 +1,8 @@
 package com.capgemini.nsc.arch.imdg.details.storage.hazelcast;
 
-import java.util.List;
+import java.util.Map;
 
+import com.capgemini.nsc.arch.imdg.domain.Order;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -19,9 +20,9 @@ public class HazelcastClientProvider {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		List<Object> list = hazelcast.getList("orders");
-		System.out.println("Total: " + list.size());
-		list.forEach(e -> System.out.println(e));
+		Map<Long, Order> map = hazelcast.getMap("orders");
+		System.out.println("Total: " + map.size());
+		map.values().forEach(e -> System.out.println(e));
 		System.out.println("Done!");
 	}
 }
